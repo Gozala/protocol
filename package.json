@@ -1,0 +1,30 @@
+{
+  "name": "protocol",
+  "id": "protocol",
+  "version": "0.0.1",
+  "description": "Pattern matching for JavaScript.",
+  "keywords": [ "functions", "pattern", "match", "cotract" ],
+  "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)",
+  "homepage": "https://github.com/Gozala/protocol",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gozala/protocol.git",
+    "web": "https://github.com/Gozala/protocol"
+  },
+  "bugs": {
+    "web": "http://github.com/Gozala/protocol/issues/"
+  },
+  "devDependencies": {
+    "test": ">=0.0.10"
+  },
+  "engines": {
+    "node": "0.4.x"
+  },
+  "scripts": {
+    "test": "node tests/test-all.js"
+  },
+  "licenses": [{
+    "type" : "MIT",
+    "url" : "http://jeditoolkit.com/LICENSE"
+  }]
+}
