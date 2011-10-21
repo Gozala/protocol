@@ -7,7 +7,7 @@
 
 "use strict";
 
-var defn = require('../core').defn
+var dispatcher = require('../core').dispatcher
 
 exports['test arity based match'] = function(assert) {
   function identity(value) { return function() { return value } }
@@ -25,7 +25,7 @@ exports['test arity based match'] = function(assert) {
   }
 
   // Match different arity.
-  var sum = defn({ doc: "sums given numbers", added: "0.1.0" },
+  var sum = dispatcher({ doc: "sums given numbers", added: "0.1.0" },
     [], function() { called.nothing ++; return 0 },
     [ number ], function(x) { called.number ++; return x },
     [ number, number ], function(x, y) { called.number_number ++; return x + y },
@@ -70,7 +70,7 @@ exports['test argument type based match'] = function(assert) {
   }
 
   // Match by different input types.
-  var map = defn({ added: "0.1.0" },
+  var map = dispatcher({ added: "0.1.0" },
     [ lambda, string ], function(lambda, string) {
       var index = -1, length = string.length, chars = []
       while (++index < length) chars[index] = lambda(string[index])

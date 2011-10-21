@@ -7,7 +7,7 @@
 
 "use strict";
 
-var defn = (function (slicer, isArray) {
+var dispatcher = (function(slicer, isArray) {
   // Creating a shortcuts:
   slicer = Array.prototype.slice
   isArray = Array.isArray
@@ -62,7 +62,7 @@ var defn = (function (slicer, isArray) {
     }
   }
 
-  return function defn(meta, params) {
+  return function dispatcher(meta, params) {
     /**
     This function can be used to implement functions supporting range of
     protocols, in a declarative manner avoiding mess of conditional blocks &
@@ -96,16 +96,17 @@ var defn = (function (slicer, isArray) {
     // Take all the params except 1st one, as we expect it to be a metadata
     // object associated with a resulting function.
     params = slicer.call(arguments, 1)
-    meta = meta || {}
 
     // If metadata is a string, then we interpret it as documentation string
     // and there for normalize to a metadata object with a doc property
     // containing this string.
-    if (typeof(meta) === 'string') meta = { doc: meta }
+    if (typeof(meta) === 'string') meta = { doc: meta  }
 
     // If first argument is not an array or is non-object, then it's part of
     // pattern match rules so we unshift it back to params.
     if (isArray(meta)) (params.unshift(meta), meta = {})
+
+    meta.error = meta.error || 'Unsupported protocol'
 
     // `params` are expected to have a following form:
     // `[ pattern1, fn1, pattern2, fn2, ... ]` where `pattern` is an array
@@ -135,7 +136,7 @@ var defn = (function (slicer, isArray) {
       }
 
       // If matching route not found throw an exception.
-      throw TypeError('Unsupported protocol')
+      throw TypeError(meta.error)
     }
 
     // Metadata is copied to the composed function (`name` property is treated
@@ -147,6 +148,6 @@ var defn = (function (slicer, isArray) {
     return router
   } 
 })()
-exports.defn = defn
+exports.dispatcher = dispatcher
 
 });

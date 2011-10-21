@@ -1,24 +1,24 @@
 {
-  "name": "protocol",
-  "id": "protocol",
-  "version": "0.0.1",
+  "name": "dispatcher",
+  "id": "dispatcher",
+  "version": "0.0.2",
   "description": "Pattern matching for JavaScript.",
-  "keywords": [ "functions", "pattern", "match", "cotract" ],
+  "keywords": [ "functions", "pattern", "match", "cotract", "dispatch" ],
   "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)",
-  "homepage": "https://github.com/Gozala/protocol",
+  "homepage": "https://github.com/Gozala/dispatcher",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Gozala/protocol.git",
-    "web": "https://github.com/Gozala/protocol"
+    "url": "https://github.com/Gozala/dispatcher.git",
+    "web": "https://github.com/Gozala/dispatcher"
   },
   "bugs": {
-    "web": "http://github.com/Gozala/protocol/issues/"
+    "web": "http://github.com/Gozala/dispatcher/issues/"
   },
   "devDependencies": {
     "test": ">=0.0.10"
   },
   "engines": {
-    "node": "0.4.x"
+    "node": ">=0.4.x"
   },
   "scripts": {
     "test": "node tests/test-all.js"
