@@ -81,6 +81,18 @@ exports['test argument type based match'] = function(assert) {
       while (++index < length) elements[index] = lambda(array[index])
       return elements
     },
+    [ lambda, [ array ] ], function(lambda, arrays) {
+      var length = arrays.length, index, element, value = [], n = 0
+      while (true) {
+        element = []
+        index = -1
+        while (++index < length) {
+          if (arrays[index].length <= n) return value
+          element[index] = arrays[index][n]
+        }
+        value[n++] = lambda.apply(null, element)
+      }
+    },
     [ lambda, object ], function(lambda, object) {
       var pair, value = Object.create(Object.getPrototypeOf(object))
       for (var key in object) {
@@ -101,6 +113,9 @@ exports['test argument type based match'] = function(assert) {
                          { a: 'foo', 'b': 2 }),
                      { '@a': 'foo!', '@b': '2!' }, 'works with hashes')
     assert.equal(map(function($) { return $ + 1 }, 6), 7, 'works with numbers')
+
+    assert.deepEqual(map(function(a, b) { return '' + a + b }, [ 1, 2, 3 ], [ 'a', 'b' ]),
+                 [ '1a', '2b' ], 'rest guard works')
 
     assert.throws(function() {
       map(function() {}, 'hello', 'world')
