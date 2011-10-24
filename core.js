@@ -42,8 +42,12 @@ var dispatcher = (function(slicer, isArray) {
         // this and all the following arguments into an array. There for slice
         // all the `args` starting from this one push into matches and return
         // immediately.
-        else if (isArray(pattern[index]))
-          return matches[index] = slicer.call(args, index), matches
+        else if (isArray(pattern[index])) {
+          matches[index] = slicer.call(args, index)
+          if (pattern[index][0])
+            matches[index] = matches[index].map(pattern[index][0])
+          return matches
+        }
 
         // In all other cases patterns are treated as constants. If it matches
         // argument, put it into matches.
