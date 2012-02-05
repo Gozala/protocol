@@ -1,7 +1,7 @@
 {
   "name": "protocol",
   "id": "protocol",
-  "version": "0.0.3",
+  "version": "0.2.0",
   "description": "Protocol based polymorphism for javascript.",
   "keywords": [ "polymorphism", "protocol", "cotract" ],
   "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)",
@@ -15,14 +15,18 @@
     "url": "http://github.com/Gozala/protocol/issues/"
   },
   "devDependencies": {
-    "test": ">=0.0.10"
+    "test": ">=0.0.10",
+    "repl-utils": ">=0.0.1",
+    "swank-js": ">=0.0.1"
   },
   "engines": {
     "node": ">=0.4.x"
   },
   "main": "./core.js",
   "scripts": {
-    "test": "node tests/test-all.js"
+    "test": "node tests/test-all.js",
+    "repl": "node ./node_modules/repl-utils",
+    "swank": "node ./node_modules/swank-js"
   },
   "licenses": [{
     "type" : "MIT",
