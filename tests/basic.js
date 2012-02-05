@@ -3,123 +3,39 @@
          forin: true */
 /*global define: true */
 
-(typeof define === "undefined" ? function ($) { $(require, exports, module) } : define)(function (require, exports, module, undefined) {
+!(typeof(define) !== "function" ? function($){ $(typeof(require) !== 'function' ? (function() { throw Error('require unsupported'); }) : require, typeof(exports) === 'undefined' ? this : exports); } : define)(function(require, exports) {
 
-"use strict";
+'use strict';
 
-var dispatcher = require('../core').dispatcher
+var protocol = require('../core').protocol
+var meta
 
-exports['test arity based match'] = function(assert) {
-  function identity(value) { return function() { return value } }
+exports['test basics'] = function(assert) {
+  var sequence = protocol(('Logical list abstraction', {
+    first: ('Returns first item of this sequence', [ 'this' ]),
+    rest: ('Returns sequence of items after the first', [ 'this' ]),
+    stick: ('Returns sequence of items where head is first, and this is rest', [ 'head', 'this' ])
+  }))
+  (String, {
+    first: function(string) { return string[0] || null },
+    rest: function(string) { return String.prototype.substr.call(string, 1) },
+    stick: function(item, string) { return item + string }
+  })
+  (Array, {
+    first: function(array) { return array[0] || null },
+    rest: function(array) { return Array.prototype.slice.call(array, 1) },
+    stick: function(item, array) {
+      return Array.prototype.concat.call([ item ], array)
+    }
+  })
 
-  function number(value) {
-    if (typeof(value) !== 'number') throw Error('Not a number')
-    return value
-  }
+  assert.equal(sequence.first([ 1, 2, 3 ]), 1, 'first works on array')
+  assert.deepEqual(sequence.rest([ 1, 2, 3]), [ 2, 3 ], 'rest works on array')
+  assert.deepEqual(sequence.stick(1, [ 2, 3 ]), [ 1, 2, 3 ], 'stick works on array')
 
-  var called = {
-    nothing: 0,
-    number: 0,
-    number_number: 0,
-    number_rest: 0
-  }
-
-  // Match different arity.
-  var sum = dispatcher({ doc: "sums given numbers", added: "0.1.0" },
-    [], function() { called.nothing ++; return 0 },
-    [ number ], function(x) { called.number ++; return x },
-    [ number, number ], function(x, y) { called.number_number ++; return x + y },
-    [ number, [] ], function (x, rest) {
-      called.number_rest ++;
-      return rest.reduce(function(x, y) {
-        return x + y
-      }, x)
-    })
-
-  assert.equal(sum(), 0, 'sum() -> 0')
-  assert.equal(called.nothing, 1, 'called sum with no args once')
-  assert.equal(sum(2), 2, 'sum(2) -> 2')
-  assert.equal(sum(17), 17, 'sum(17) -> 17')
-  assert.equal(called.number, 2, 'called sum with one arg twice')
-  assert.equal(sum(2, 3), 5, 'sum(2, 3) -> 5')
-  assert.equal(called.number_number, 1, 'called sum with two args once')
-  assert.equal(sum(2, 5, 17, 1), 25, 'sum(2, 5, 17, 1) -> 25')
-  assert.equal(called.number_rest, 1, 'called sum with rest once')
-
-  assert.throws(function() {
-    sum({})
-  }, /Unsupported protocol/, 'throws on unexpected input type')
-}
-
-exports['test argument type based match'] = function(assert) {
-  function string(value) {
-    if (typeof(value) !== 'string') throw Error('Not a string')
-    return value
-  }
-  function lambda(value) {
-    if (typeof(value) !== 'function') throw Error('Not a function')
-    return value
-  }
-  function array(value) {
-    if (!Array.isArray(value)) throw Error('Not an array')
-    return value
-  }
-  function object(value) {
-    if (!value || typeof(value) !== 'object') throw new Error('Not an object')
-    return value
-  }
-
-  // Match by different input types.
-  var map = dispatcher({ added: "0.1.0" },
-    [ lambda, string ], function(lambda, string) {
-      var index = -1, length = string.length, chars = []
-      while (++index < length) chars[index] = lambda(string[index])
-      return chars.join('')
-    },
-    [ lambda, array ], function(lambda, array) {
-      var index = -1, length = array.length, elements = []
-      while (++index < length) elements[index] = lambda(array[index])
-      return elements
-    },
-    [ lambda, [ array ] ], function(lambda, arrays) {
-      var length = arrays.length, index, element, value = [], n = 0
-      while (true) {
-        element = []
-        index = -1
-        while (++index < length) {
-          if (arrays[index].length <= n) return value
-          element[index] = arrays[index][n]
-        }
-        value[n++] = lambda.apply(null, element)
-      }
-    },
-    [ lambda, object ], function(lambda, object) {
-      var pair, value = Object.create(Object.getPrototypeOf(object))
-      for (var key in object) {
-        pair = lambda(key, object[key])
-        value[pair[0]] = pair[1]
-      }
-      return value
-    },
-    [ lambda,, ], function(lambda, value) {
-      return lambda(value)
-    })
-
-    assert.equal(map(function($) { return $.toUpperCase() }, 'hello world'),
-                 'HELLO WORLD', 'works with strings')
-    assert.deepEqual(map(function($) { return $ * 2 }, [ 1, 2, 3 ]),
-                     [ 2, 4, 6 ], 'works with array')
-    assert.deepEqual(map(function(k, v) { return [ '@' + k, v + '!' ] },
-                         { a: 'foo', 'b': 2 }),
-                     { '@a': 'foo!', '@b': '2!' }, 'works with hashes')
-    assert.equal(map(function($) { return $ + 1 }, 6), 7, 'works with numbers')
-
-    assert.deepEqual(map(function(a, b) { return '' + a + b }, [ 1, 2, 3 ], [ 'a', 'b' ]),
-                 [ '1a', '2b' ], 'rest guard works')
-
-    assert.throws(function() {
-      map(function() {}, 'hello', 'world')
-    }, /Unsupported protocol/, 'throws on more arguments then expected')
+  assert.equal(sequence.first('hello'), 'h', 'first works on strings')
+  assert.equal(sequence.rest('hello'), 'ello', 'rest works on strings')
+  assert.equal(sequence.stick('h', 'ello'), 'hello', 'stick works on strings')
 }
 
 if (module == require.main)
