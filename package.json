@@ -14,9 +14,6 @@
   "bugs": {
     "url": "http://github.com/Gozala/protocol/issues/"
   },
-  "dependencies": {
-    "dispatcher": ">=0.0.2"
-  },
   "devDependencies": {
     "test": ">=0.0.10"
   },
