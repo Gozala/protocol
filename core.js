@@ -10,7 +10,7 @@ var Arguments = Object.getPrototypeOf(args)
 var stringify = unbind(Object.prototype.toString)
 
 function Name(name) {
-  return ':' + Math.round(Math.random() * 1000000000000000) + ':' + (name || '')
+  return ':' + (name || '') + ':' + Math.round(Math.random() * 1000000000000000)
 }
 
 var numbery = stringify(Number.prototype)
