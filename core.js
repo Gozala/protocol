@@ -114,7 +114,7 @@ function define(signature) {
 // the application.
 Object.defineProperties(define, builtins.descriptor)
 define.define = define
-exports.define = define
+
 exports.Protocol = define
 exports.protocol = define
 
