@@ -24,9 +24,9 @@ A protocol is a named set of functions and their signatures:
 var protocol = require('protocol/core').protocol
 
 var sequence = protocol(('Logical list abstraction', {
-  first: ('Returns first item of this sequence', [ 'this' ]),
-  rest: ('Returns sequence of items after the first', [ 'this' ]),
-  stick: ('Returns sequence of items where head is first, and this is rest', [ 'head', 'this' ])
+  first: ('Returns first item of this sequence', [ protocol ]),
+  rest: ('Returns sequence of items after the first', [ protocol ]),
+  stick: ('Returns sequence of items where head is first, and this is rest', [ Object, protocol ])
 }))
 ```
 
@@ -34,8 +34,8 @@ var sequence = protocol(('Logical list abstraction', {
 - Docs can be optionally specified for the protocol and the functions, via
   elegant JS hack.
 - The above yields a set of polymorphic functions and a protocol object
-- The resulting functions dispatch on the type of their `'this'` argument, and
-  thus must have it in the list of arguments.
+- The resulting functions dispatch on the type of their `protocol` argument,
+  and thus must have it in the list of arguments.
 
 `protocol` will generate an interface containing a corresponding functions.
 returned interface may be used to extend data types with it's implementations:
