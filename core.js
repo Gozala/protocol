@@ -104,7 +104,7 @@ function define(signature) {
       if (!f) throw TypeError('Protocol is not implemented: ' + key)
       return f.apply(f, arguments)
     }
-    method[':this-index'] = signature[key].indexOf('this')
+    method[':this-index'] = signature[key].indexOf(define)
     method[':name'] = Name(key)
     protocol[key] = method
   })

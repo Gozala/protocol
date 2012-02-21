@@ -12,9 +12,9 @@ var meta
 
 exports['test basics'] = function(assert) {
   var sequence = protocol(('Logical list abstraction', {
-    first: ('Returns first item of this sequence', [ 'this' ]),
-    rest: ('Returns sequence of items after the first', [ 'this' ]),
-    stick: ('Returns sequence of items where head is first, and this is rest', [ 'head', 'this' ])
+    first: ('Returns first item of this sequence', [ protocol ]),
+    rest: ('Returns sequence of items after the first', [ protocol ]),
+    stick: ('Returns sequence of items where head is first, and this is rest', [ Object, protocol ])
   }))
   (String, {
     first: function(string) { return string[0] || null },
