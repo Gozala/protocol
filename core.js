@@ -4,20 +4,56 @@
 
 'use strict';
 
+var unbind = Function.call.bind(Function.bind, Function.call)
+var args = (function() { return arguments })()
+var Arguments = Object.getPrototypeOf(args)
+var stringify = unbind(Object.prototype.toString)
+
 function Name(name) {
   return ':' + Math.round(Math.random() * 1000000000000000) + ':' + (name || '')
 }
 
-function define(methods) {
+var numbery = stringify(Number.prototype)
+var booleany = stringify(Boolean.prototype)
+var regexpy = String(RegExp.prototype)
+var daty = stringify(Date.prototype)
+var stringy = stringify(String.prototype)
+var argumenty = stringify(args)
+
+
+var builtins = {}
+Object.defineProperties(builtins, builtins.descriptor = {
+  Arguments: { value: {} },
+  Array: { value: {} },
+  String: { value: {} },
+  Number: { value: {} },
+  Boolean: { value: {} },
+  RegExp: { value: {} },
+  Date: { value: {} },
+  Function: { value: {} },
+  Object: { value: {} }
+})
+
+var isArray = Array.isArray
+function isString(type) { return stringify(type) === stringy }
+function isNumber(type) { return stringify(type) === numbery }
+function isBoolean(type) { return stringify(type) === booleany }
+function isDate(type) { return stringify(type) === daty }
+function isRegExp(type) { return String(type) === regexpy }
+function isArguments(type) { return stringify(type) === argumenty }
+function isFunction(type) { return typeof(type) === 'undefined' }
+function isObject(type) { return Object.getPrototypeOf(type) === null }
+
+function define(signature) {
   /**
   Defines new protocol that may be implemented for different types.
 
   ## Example
 
   var sequence = protocol.define(('Logical list abstraction', {
-    first: ('Returns the first item in the sequence', [ 'this' ]),
-    rest: ('Returns a sequence of the items after the first', [ 'this' ]),
-    stick: ('Returns a new sequence where item is first, and this is rest', [ 'item', 'this' ])
+    first: ('Returns the first item in the sequence', [ protocol ]),
+    rest: ('Returns a sequence of the items after the first', [ protocol ]),
+    stick: ('Returns a new sequence where item is first, and this is rest', [ Object, protocol ])
   }))
 
   **/
@@ -42,21 +78,40 @@ function define(methods) {
     **/
     return extend(protocol, type, methods)
   }
-  Object.keys(methods).forEach(function(key) {
+  Object.keys(signature).forEach(function(key) {
     function method() {
-      var index = ':this-index' in method ? method[':this-index']
-                                          : arguments.length - 1
+      var index = method[':this-index']
       var name = method[':name']
-      var self = arguments[index]
-      if (!self[name]) throw TypeError('Protocol not implemented: ' + key)
-      return self[name].apply(self, arguments)
+      var target = arguments[index]
+      var f = (target[name] ||
+        // Following fallbacks are probably slow but not a big issues anyway
+        // as they only execute if `target` either does not implements protocol
+        // or it's from scope with different globals. In later case that's a
+        // price to pay for multiple set of built-ins. Also there is always an
+        // option to execute protocol implementation there to go with a fast
+        // path.
+        (isArray(target) && builtins.Array[name]) ||
+        (isString(target) && builtins.String[name]) ||
+        (isNumber(target) && builtins.Number[name]) ||
+        (isBoolean(target) && builtins.Boolean[name]) ||
+        (isDate(target) && builtins.Date[name]) ||
+        (isRegExp(target) && builtins.RegExp[name]) ||
+        (isArguments(target) && builtins.Arguments[name]) ||
+        (isFunction(target) && builtins.Function[name]) ||
+        (isObject(target) && builtins.Object[name]))
+
+      if (!f) throw TypeError('Protocol is not implemented: ' + key)
+      return f.apply(f, arguments)
     }
-    method[':this-index'] = methods[key].indexOf('this')
+    method[':this-index'] = signature[key].indexOf('this')
     method[':name'] = Name(key)
     protocol[key] = method
   })
   return protocol
 }
+// Export local built-ins so that extensions can be defined across the rest of
+// the application.
+Object.defineProperties(define, builtins.descriptor)
 define.define = define
 exports.define = define
 exports.Protocol = define
@@ -83,4 +138,4 @@ function extend(protocol, type, implementation) {
 exports.extend = extend
 define.extend = extend
 
-})
+});
