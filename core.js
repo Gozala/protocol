@@ -78,6 +78,7 @@ function define(signature) {
     **/
     return extend(protocol, type, methods)
   }
+  protocol.signature = signature
   Object.keys(signature).forEach(function(key) {
     function method() {
       var index = method[':this-index']
