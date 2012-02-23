@@ -42,7 +42,7 @@ function isDate(type) { return stringify(type) === daty }
 function isRegExp(type) { return String(type) === regexpy }
 function isArguments(type) { return stringify(type) === argumenty }
 function isFunction(type) { return typeof(type) === 'undefined' }
-function isObject(type) { return Object.getPrototypeOf(type) === null }
+function isObject(type) { return type && typeof(type) === 'object' }
 
 function define(signature) {
   /**
