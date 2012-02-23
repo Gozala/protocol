@@ -1,5 +1,9 @@
 # Changes #
 
+## 0.2.2 / 2012-02-22
+
+  - Fix incorrect behavior when extending `protocol.Object`.
+
 ## 0.2.1 / 2012-02-21
 
   - Support for multi-globals by exposing `protocol.Object`, `protocol.String`,
