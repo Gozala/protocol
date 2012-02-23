@@ -1,7 +1,7 @@
 {
   "name": "protocol",
   "id": "protocol",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Protocol based polymorphism for javascript.",
   "keywords": [ "polymorphism", "protocol", "cotract" ],
   "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)",

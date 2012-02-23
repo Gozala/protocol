@@ -1,5 +1,9 @@
 # Changes #
 
+## 0.2.3 / 2012-02-23
+
+  - Add convenience syntax for extending multiple types in a same call.
+
 ## 0.2.2 / 2012-02-22
 
   - Fix incorrect behavior when extending `protocol.Object`.
