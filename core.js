@@ -5,6 +5,7 @@
 'use strict';
 
 var unbind = Function.call.bind(Function.bind, Function.call)
+var slice = unbind(Array.prototype.slice)
 var args = (function() { return arguments })()
 var Arguments = Object.getPrototypeOf(args)
 var stringify = unbind(Object.prototype.toString)
@@ -76,7 +77,10 @@ function define(signature) {
       }
     })
     **/
-    return extend(protocol, type, methods)
+    var types = slice(arguments)
+    methods = types.pop()
+    while (types.length) extend(protocol, types.shift(), methods)
+    return protocol
   }
   protocol.signature = signature
   Object.keys(signature).forEach(function(key) {
