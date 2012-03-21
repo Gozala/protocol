@@ -6,9 +6,13 @@
 
 var unbind = Function.call.bind(Function.bind, Function.call)
 var slice = unbind(Array.prototype.slice)
+var owns = unbind(Object.prototype.hasOwnProperty)
 var args = (function() { return arguments })()
 var Arguments = Object.getPrototypeOf(args)
 var stringify = unbind(Object.prototype.toString)
+
+var ERROR_IMPLEMENTS = 'Type already implements this protocol: '
+var ERROR_DOES_NOT_IMPLEMENTS = 'Protocol is not implemented: '
 
 function Name(name) {
   return ':' + (name || '') + ':' + Math.round(Math.random() * 1000000000000000)
@@ -105,7 +109,7 @@ function define(signature) {
         (isFunction(target) && builtins.Function[name]) ||
         (isObject(target) && builtins.Object[name]))
 
-      if (!f) throw TypeError('Protocol is not implemented: ' + key)
+      if (!f) throw TypeError(ERROR_DOES_NOT_IMPLEMENTS + key)
       return f.apply(f, arguments)
     }
     method[':this-index'] = signature[key].indexOf(define)
@@ -128,7 +132,7 @@ function extend(protocol, type, implementation) {
   Object.keys(implementation).forEach(function(key, name) {
     if (key in protocol) {
       name = protocol[key][':name']
-      if (name in type) throw Error('Type already implements protocol: ' + key)
+      if (owns(type, name)) throw Error(ERROR_IMPLEMENTS + key)
       descriptor[name] = {
         value: implementation[key],
         enumerable: false,
