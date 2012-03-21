@@ -15,7 +15,7 @@ var ERROR_IMPLEMENTS = 'Type already implements this protocol: '
 var ERROR_DOES_NOT_IMPLEMENTS = 'Protocol is not implemented: '
 
 function Name(name) {
-  return ':' + (name || '') + ':' + Math.round(Math.random() * 1000000000000000)
+  return ':' + (name || '') + ':' + Math.random().toString(36).slice(2)
 }
 
 var numbery = stringify(Number.prototype)
