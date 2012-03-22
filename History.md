@@ -1,5 +1,12 @@
 # Changes #
 
+## 0.2.4 / 2012-03-21
+
+  - Make possible to implement protocol for a type even if ancestors already
+    implemented it.
+  - Use shorter names for protocol properties.
+  - Provide some code examples.
+
 ## 0.2.3 / 2012-02-23
 
   - Add convenience syntax for extending multiple types in a same call.
