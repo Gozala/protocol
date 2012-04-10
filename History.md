@@ -1,4 +1,9 @@
-# Changes #
+# Changes
+
+## 0.3.1 / 2012-04-10
+
+  - Actually stop mutating built-ins.
+  - Typo fixes.
 
 ## 0.3.0 / 2012-04-10
 
