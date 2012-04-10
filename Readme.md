@@ -23,11 +23,11 @@ A protocol is a named set of function signatures:
 ```js
 var protocol = require('protocol/core').protocol
 
-var Sequential = protocol(('Logical list abstraction', {
+var Sequential = protocol('Logical list abstraction', {
   first: ('Returns first item of this sequence', [ protocol ]),
   rest: ('Returns sequence of items after the first', [ protocol ]),
   join: ('Returns sequence of items where head is first, and this is rest', [ Object, protocol ])
-}))
+})
 ```
 
 - No implementations are provided
@@ -77,7 +77,7 @@ it for `Object`:
 
 ```js
 Sequential(Object, {
-  first: function(_) { retun _ },
+  first: function(_) { return _ },
   rest: function(_) { return null }
 })
 
