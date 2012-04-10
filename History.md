@@ -1,5 +1,12 @@
 # Changes #
 
+## 0.3.0 / 2012-04-10
+
+  - Stop mutating builtins.
+  - Remove alias names for `protocol` function.
+  - Add API for in-line protocol implementations.
+  - Add more tests.
+
 ## 0.2.4 / 2012-03-21
 
   - Make possible to implement protocol for a type even if ancestors already
