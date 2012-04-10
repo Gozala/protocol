@@ -23,7 +23,8 @@ function typeOf(value) {
   /**
   Normalized version of `typeof`.
   **/
-  return stringify(value).split(' ')[1].split(']')[0]
+  var type = stringify(value).split(' ')[1].split(']')[0]
+  return type === 'Object' && Object.getPrototypeOf(value) ? 'Type' : type
 }
 
 var types = {
@@ -86,10 +87,11 @@ function protocol(signature) {
       var index = method[':this-index']
       var name = method[':name']
       var target = arguments[index]
+      var type = typeOf(target)
       var f = (
-        (target && target[name]) ||           // By instance
-        (types[typeOf(target)][name]) ||      // By type
-        (types.Object[name]))                 // Default
+        (target && target[name]) ||                   // By instance
+        (type in types && types[type][name]) ||       // By type
+        (types.Object[name]))                         // Default
 
       if (!f) throw TypeError(ERROR_DOES_NOT_IMPLEMENTS + key)
       return f.apply(f, arguments)
@@ -105,10 +107,8 @@ exports.protocol = protocol
 
 function extend(protocol, type, implementation) {
   var descriptor = {}
-  if (typeof(type) === 'function' && typeof(type.prototype) !== 'function')
-    type = type.prototype
-  else
-    type = types[typeOf(type)] || type
+  if (typeof(type) === 'function') type = type.prototype
+  type = types[typeOf(type)] || type
 
   Object.keys(implementation).forEach(function(key, name) {
     if (key in protocol) {

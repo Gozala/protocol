@@ -109,6 +109,21 @@ exports['test inline types'] = function(assert) {
   assert.equal(Foo.isFoo(bar), true, 'bar is foo')
 }
 
+exports['test that globals are not mutated'] = function(assert) {
+  var prototypeNames = Object.getOwnPropertyNames(Object.prototype)
+  var functionNames = Object.getOwnPropertyNames(Object)
+
+  var Foo = protocol({
+    isFoo: [ protocol ]
+  })
+  Foo(Object, { isFoo: function(object) { return false } })
+
+  assert.deepEqual(Object.getOwnPropertyNames(Object),
+                   functionNames, 'no properties were added to function')
+  assert.deepEqual(Object.getOwnPropertyNames(Object.prototype),
+                   prototypeNames, 'no properties were added to prototype')
+}
+
 if (module == require.main)
   require('test').run(exports);
 
