@@ -16,17 +16,17 @@ There are several motivations for protocols:
 - Protocols allow independent extension of the set of types, protocols, and
   implementations of protocols on types, by different parties.
 
-### Basics
+## Basics
 
-A protocol is a named set of functions and their signatures:
+A protocol is a named set of function signatures:
 
 ```js
 var protocol = require('protocol/core').protocol
 
-var sequence = protocol(('Logical list abstraction', {
+var Sequential = protocol(('Logical list abstraction', {
   first: ('Returns first item of this sequence', [ protocol ]),
   rest: ('Returns sequence of items after the first', [ protocol ]),
-  stick: ('Returns sequence of items where head is first, and this is rest', [ Object, protocol ])
+  join: ('Returns sequence of items where head is first, and this is rest', [ Object, protocol ])
 }))
 ```
 
@@ -41,10 +41,10 @@ var sequence = protocol(('Logical list abstraction', {
 returned interface may be used to extend data types with it's implementations:
 
 ```js
-sequence(Array, {
+Sequential(Array, {
   first: function(array) { return array[0] || null },
   rest: function(array) { return Array.prototype.slice.call(array, 1) },
-  stick: function(item, array) {
+  join: function(item, array) {
     return Array.prototype.concat.call([ item ], array)
   }
 })
@@ -54,28 +54,54 @@ Once protocol is implemented for a given type it can be used with a given data
 types:
 
 ```js
-sequence.first([ 1, 2, 3 ]) // => 1
-sequence.rest([ 1, 2, 3 ])  // => [ 2, 3 ]
+Sequential.first([ 1, 2, 3 ]) // => 1
+Sequential.rest([ 1, 2, 3 ])  // => [ 2, 3 ]
 
-sequence.first('hello')     // TypeError: Protocol not implemented: first
+Sequential.first('hello')     // TypeError: Protocol not implemented: first
 ```
 
 Protocol may be implemented for any other data types by any other party:
 
 ```js
-sequence(String, {
+Sequential(String, {
   first: function(string) { return string[0] || null },
   rest: function(string) { return String.prototype.substr.call(string, 1) },
-  stick: function(item, string) { return item + string }
+  join: function(item, string) { return item + string }
 })
 
-sequence.first('hello')     // => 'h'
+Sequential.first('hello')     // => 'h'
+```
+
+Protocol implementation may be provided to all the data types by implementing
+it for `Object`:
+
+```js
+Sequential(Object, {
+  first: function(_) { retun _ },
+  rest: function(_) { return null }
+})
+
+Sequential.head(5)          // => 5
+Sequential.tail(3)          // => null
+```
+
+Also it's easy to create objects implementing protocol without defining a
+specific type:
+
+
+```js
+var sequence = Sequntial({
+  head: function(_) { return 1 },
+  tail: function(_) { return null }
+})
+
+'head' in sequence          // => false
+Sequntial.head(sequence)    // => 1
 ```
 
 Since protocol implementations are decoupled from the actual protocol
 definition there maybe multiple implementations, but user will be in charge of
 deciding which one to pull in.
-
 
 ## Argument pattern based dispatch
 
