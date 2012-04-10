@@ -7,49 +7,41 @@
 var unbind = Function.call.bind(Function.bind, Function.call)
 var slice = unbind(Array.prototype.slice)
 var owns = unbind(Object.prototype.hasOwnProperty)
-var args = (function() { return arguments })()
-var Arguments = Object.getPrototypeOf(args)
 var stringify = unbind(Object.prototype.toString)
 
 var ERROR_IMPLEMENTS = 'Type already implements this protocol: '
 var ERROR_DOES_NOT_IMPLEMENTS = 'Protocol is not implemented: '
 
 function Name(name) {
+  /**
+  Generating unique property names.
+  **/
   return ':' + (name || '') + ':' + Math.random().toString(36).slice(2)
 }
 
-var numbery = stringify(Number.prototype)
-var booleany = stringify(Boolean.prototype)
-var regexpy = String(RegExp.prototype)
-var daty = stringify(Date.prototype)
-var stringy = stringify(String.prototype)
-var argumenty = stringify(args)
+function typeOf(value) {
+  /**
+  Normalized version of `typeof`.
+  **/
+  return stringify(value).split(' ')[1].split(']')[0]
+}
 
+var types = {
+  'Arguments': {},
+  'Array': {},
+  'String': {},
+  'Number': {},
+  'Boolean': {},
+  'RegExp': {},
+  'Date': {},
+  'Function': {},
+  'Object': {},
+  'Undefined': {},
+  'Null': {}
+}
+exports.types = types
 
-var builtins = {}
-Object.defineProperties(builtins, builtins.descriptor = {
-  Arguments: { value: {} },
-  Array: { value: {} },
-  String: { value: {} },
-  Number: { value: {} },
-  Boolean: { value: {} },
-  RegExp: { value: {} },
-  Date: { value: {} },
-  Function: { value: {} },
-  Object: { value: {} }
-})
-
-var isArray = Array.isArray
-function isString(type) { return stringify(type) === stringy }
-function isNumber(type) { return stringify(type) === numbery }
-function isBoolean(type) { return stringify(type) === booleany }
-function isDate(type) { return stringify(type) === daty }
-function isRegExp(type) { return String(type) === regexpy }
-function isArguments(type) { return stringify(type) === argumenty }
-function isFunction(type) { return typeof(type) === 'undefined' }
-function isObject(type) { return type && typeof(type) === 'object' }
-
-function define(signature) {
+function protocol(signature) {
   /**
   Defines new protocol that may be implemented for different types.
 
@@ -62,7 +54,7 @@ function define(signature) {
   }))
 
   **/
-  function protocol(type, methods) {
+  function Protocol(type, methods) {
     /**
     Extends this protocol by implementing it for the given `type`.
 
@@ -83,52 +75,41 @@ function define(signature) {
     **/
     var types = slice(arguments)
     methods = types.pop()
-    while (types.length) extend(protocol, types.shift(), methods)
-    return protocol
+    if (!types.length) return extend(Protocol, {}, methods)
+    while (types.length) extend(Protocol, types.shift(), methods)
   }
-  protocol.signature = signature
+
+  Protocol.signature = signature
+  var descriptor = {}
   Object.keys(signature).forEach(function(key) {
     function method() {
       var index = method[':this-index']
       var name = method[':name']
       var target = arguments[index]
-      var f = (target[name] ||
-        // Following fallbacks are probably slow but not a big issues anyway
-        // as they only execute if `target` either does not implements protocol
-        // or it's from scope with different globals. In later case that's a
-        // price to pay for multiple set of built-ins. Also there is always an
-        // option to execute protocol implementation there to go with a fast
-        // path.
-        (isArray(target) && builtins.Array[name]) ||
-        (isString(target) && builtins.String[name]) ||
-        (isNumber(target) && builtins.Number[name]) ||
-        (isBoolean(target) && builtins.Boolean[name]) ||
-        (isDate(target) && builtins.Date[name]) ||
-        (isRegExp(target) && builtins.RegExp[name]) ||
-        (isArguments(target) && builtins.Arguments[name]) ||
-        (isFunction(target) && builtins.Function[name]) ||
-        (isObject(target) && builtins.Object[name]))
+      var f = (
+        (target && target[name]) ||           // By instance
+        (types[typeOf(target)][name]) ||      // By type
+        (types.Object[name]))                 // Default
 
       if (!f) throw TypeError(ERROR_DOES_NOT_IMPLEMENTS + key)
       return f.apply(f, arguments)
     }
-    method[':this-index'] = signature[key].indexOf(define)
+    method[':this-index'] = signature[key].indexOf(protocol)
     method[':name'] = Name(key)
-    protocol[key] = method
+    descriptor[key] = { value: method, enumerable: true }
   })
-  return protocol
-}
-// Export local built-ins so that extensions can be defined across the rest of
-// the application.
-Object.defineProperties(define, builtins.descriptor)
-define.define = define
 
-exports.Protocol = define
-exports.protocol = define
+  return Object.defineProperties(Protocol, descriptor)
+}
+exports.protocol = protocol
 
 function extend(protocol, type, implementation) {
   var descriptor = {}
-  type = typeof(type) === 'function' ? type.prototype : type
+  if (typeof(type) === 'function' && typeof(type.prototype) !== 'function')
+    type = type.prototype
+  else
+    type = types[typeOf(type)] || type
+
   Object.keys(implementation).forEach(function(key, name) {
     if (key in protocol) {
       name = protocol[key][':name']
@@ -141,10 +122,10 @@ function extend(protocol, type, implementation) {
       }
     }
   })
+
   Object.defineProperties(type, descriptor)
-  return protocol
+  return type
 }
 exports.extend = extend
-define.extend = extend
 
 });
