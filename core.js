@@ -23,10 +23,18 @@ function typeOf(value) {
   /**
   Normalized version of `typeof`.
   **/
-  var type = stringify(value).split(' ')[1].split(']')[0]
-  return type === 'Object' && Object.getPrototypeOf(value) ? 'Type' : type
+  var type, prototype
+
+  if (value === null) return 'Null'
+  if (value === undefined) return 'Undefined'
+  type = stringify(value).split(' ')[1].split(']')[0]
+  if (type !== 'Object') return type
+  prototype = Object.getPrototypeOf(value)
+  type = stringify(prototype).split(' ')[1].split(']')[0]
+  return type === 'Object' && Object.getPrototypeOf(prototype) ? 'Type' : type
 }
 
+var Default = {}
 var types = {
   'Arguments': {},
   'Array': {},
@@ -38,7 +46,8 @@ var types = {
   'Function': {},
   'Object': {},
   'Undefined': {},
-  'Null': {}
+  'Null': {},
+  'Default': Default
 }
 exports.types = types
 
@@ -76,8 +85,9 @@ function protocol(signature) {
     **/
     var types = slice(arguments)
     methods = types.pop()
-    if (!types.length) return extend(Protocol, {}, methods)
-    while (types.length) extend(Protocol, types.shift(), methods)
+    if (!types.length) extend(Protocol, Default, methods)
+    else while (types.length) extend(Protocol, types.shift(), methods)
+    return type
   }
 
   Protocol.signature = signature
@@ -89,9 +99,10 @@ function protocol(signature) {
       var target = arguments[index]
       var type = typeOf(target)
       var f = (
-        (target && target[name]) ||                   // By instance
-        (type in types && types[type][name]) ||       // By type
-        (types.Object[name]))                         // Default
+        (target && target[name]) ||                       // By instance
+        (type in types && types[type][name]) ||           // By type
+        (type === 'Type' && types.Object[name]) ||        // By ancestor
+        (types.Default[name]))                            // Default
 
       if (!f) throw TypeError(ERROR_DOES_NOT_IMPLEMENTS + key)
       return f.apply(f, arguments)
@@ -108,7 +119,7 @@ exports.protocol = protocol
 function extend(protocol, type, implementation) {
   var descriptor = {}
   if (typeof(type) === 'function') type = type.prototype
-  type = types[typeOf(type)] || type
+  type = types[typeOf(type && Object.create(type))] || type
 
   Object.keys(implementation).forEach(function(key, name) {
     if (key in protocol) {

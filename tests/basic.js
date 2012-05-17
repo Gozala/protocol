@@ -68,7 +68,7 @@ exports['test default & type specific implementations'] = function(assert) {
     tail: [ protocol ]
   })
 
-  Sequence(Object, {
+  Sequence({
     head: function(object) { return object },
     tail: function(object) { return null }
   })
@@ -95,18 +95,6 @@ exports['test default & type specific implementations'] = function(assert) {
   assert.equal(Sequence.head(a), a, 'Stream inherits implementation of head')
   assert.equal(Sequence.tail(b), a, 'Stream has own implementation of tail')
 
-}
-
-exports['test inline types'] = function(assert) {
-  var Foo = protocol({
-    isFoo: [ protocol ]
-  })
-  Foo(Object, { isFoo: function(object) { return false } })
-
-  var bar = Foo({ isFoo: function(object) { return true } })
-
-  assert.equal(Foo.isFoo({}), false, 'Default is not foo')
-  assert.equal(Foo.isFoo(bar), true, 'bar is foo')
 }
 
 exports['test that globals are not mutated'] = function(assert) {
