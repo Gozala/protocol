@@ -1,5 +1,10 @@
 # Changes
 
+## 0.4.0 / 2012-05-17
+
+  - Make difference between Object and Default implementations.
+  - Remove support for inline implementations.
+
 ## 0.3.1 / 2012-04-10
 
   - Actually stop mutating built-ins.

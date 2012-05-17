@@ -1,5 +1,7 @@
 # Protocol
 
+[![build status](https://secure.travis-ci.org/Gozala/protocol.png)](http://travis-ci.org/Gozala/protocol)
+
 Protocol JS library is inspired by idea of [clojure protocols]. Protocols
 provide a powerful way for decoupling abstraction interface definition from
 an actual implementation per type, without risks of interference with other
@@ -72,31 +74,17 @@ Sequential(String, {
 Sequential.first('hello')     // => 'h'
 ```
 
-Protocol implementation may be provided to all the data types by implementing
-it for `Object`:
+Protocol implementation may be provided to all the data types by ommiting
+type argument:
 
 ```js
-Sequential(Object, {
+Sequential({
   first: function(_) { return _ },
   rest: function(_) { return null }
 })
 
 Sequential.head(5)          // => 5
 Sequential.tail(3)          // => null
-```
-
-Also it's easy to create objects implementing protocol without defining a
-specific type:
-
-
-```js
-var sequence = Sequntial({
-  head: function(_) { return 1 },
-  tail: function(_) { return null }
-})
-
-'head' in sequence          // => false
-Sequntial.head(sequence)    // => 1
 ```
 
 Since protocol implementations are decoupled from the actual protocol
